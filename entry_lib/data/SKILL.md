@@ -1,5 +1,5 @@
 ---
-name: new_entry
+name: entry
 description: Create chronologically organized documentation entries
 argument-hint: "[create|init|install-skill] [args...]"
 allowed-tools: Bash(entry *), Bash(./entry *), Bash(uvx *entry*), Read
