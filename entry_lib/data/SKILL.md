@@ -29,7 +29,7 @@ Try these in order until one works:
 
 ## Subcommand Behavior
 
-### `create <filename> [title] [--edit]`
+### `create <filename> [title] [--content BODY] [--edit]`
 Creates a new entry at `entries/YYYY/MM/DD/<filename>.md` with a standard template. If no title is given, one is generated from the filename (kebab-case to Title Case).
 
 Convert natural language to CLI arguments:
@@ -39,9 +39,32 @@ Convert natural language to CLI arguments:
 
 When the filename contains spaces, it is treated as a title and the kebab-case filename is derived automatically. So `entry create "My Finding Title"` creates `my-finding-title.md` with title "My Finding Title".
 
+#### Single-step creation with `--content`
+
+Use `--content` / `-c` to create an entry with body content in one step. The tool adds the header (title, date, time) automatically — just pass the body:
+
+```bash
+entry create "My Finding" --content "## Overview
+
+Found something interesting.
+
+## Details
+
+Here are the details."
+```
+
+Use `-c -` to read body content from stdin (useful for piping):
+
+```bash
+echo "## Overview\n\nPiped content." | entry create "My Finding" -c -
+```
+
+**This is the preferred pattern for AI agents.** It avoids the two-step create-then-edit workflow which can fail when the agent tries to Write to an existing file without reading it first.
+
 Rules:
 - Prefer passing a title with spaces — the tool slugifies it automatically
-- Use `--edit` / `-e` only if the user says they want to edit it
+- Prefer `--content` / `-c` when you have the body ready — single step, no file conflicts
+- Use `--edit` / `-e` only if the user says they want to edit it interactively
 
 ### `init`
 Run `entry init` to create the `entries/` directory. Use this when setting up a new repository for entry tracking.

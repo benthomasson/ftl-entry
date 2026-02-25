@@ -42,12 +42,21 @@ def cmd_create(args):
 
     title = title or filename.removesuffix(".md").replace("-", " ").title()
 
-    template = f"""# {title}
+    header = f"""# {title}
 
 **Date:** {now.strftime('%Y-%m-%d')}
 **Time:** {now.strftime('%H:%M')}
 
-## Overview
+"""
+
+    if args.content:
+        if args.content == "-":
+            body = sys.stdin.read()
+        else:
+            body = args.content
+        template = header + body + "\n"
+    else:
+        template = header + """## Overview
 
 ## Details
 
@@ -102,6 +111,7 @@ def main():
     create_p = sub.add_parser("create", help="Create a new entry")
     create_p.add_argument("filename", help="Entry filename (without .md)")
     create_p.add_argument("title", nargs="?", help="Entry title (default: auto from filename)")
+    create_p.add_argument("--content", "-c", help="Entry body content (use '-' for stdin)")
     create_p.add_argument("--edit", "-e", action="store_true", help="Open in $EDITOR after creation")
 
     # init
