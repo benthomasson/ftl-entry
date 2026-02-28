@@ -2,7 +2,7 @@
 name: entry
 description: Create chronologically organized documentation entries
 argument-hint: "[create|init|install-skill] [args...]"
-allowed-tools: Bash(entry *), Bash(./entry *), Bash(uvx *entry*), Read
+allowed-tools: Bash(entry *), Bash(./entry *), Bash(uvx *entry*), Read, Write
 ---
 
 You are creating documentation entries using the `entry` CLI tool. Entries are organized as `entries/YYYY/MM/DD/<filename>.md`.
@@ -39,31 +39,38 @@ Convert natural language to CLI arguments:
 
 When the filename contains spaces, it is treated as a title and the kebab-case filename is derived automatically. So `entry create "My Finding Title"` creates `my-finding-title.md` with title "My Finding Title".
 
-#### Single-step creation with `--content`
+#### Single-step creation with `--content-file` (preferred for AI agents)
 
-Use `--content` / `-c` to create an entry with body content in one step. The tool adds the header (title, date, time) automatically — just pass the body:
+Use `--content-file` / `-f` to create an entry from a file. The tool adds the header (title, date, time) automatically — the file should contain just the body:
+
+```bash
+# 1. Write body to a temp file (using the Write tool — no bash quoting issues)
+# 2. Create the entry from that file
+entry create "My Finding" --content-file /tmp/entry-body.md
+```
+
+**This is the preferred pattern for AI agents.** Content with `$`, `()`, backticks, and LaTeX math breaks bash heredocs and `--content` strings. Writing to a temp file via the Write tool avoids all quoting issues.
+
+#### `--content` for simple inline content
+
+For short content without special characters, `--content` / `-c` works inline:
 
 ```bash
 entry create "My Finding" --content "## Overview
 
-Found something interesting.
-
-## Details
-
-Here are the details."
+Found something interesting."
 ```
 
-Use `-c -` to read body content from stdin (useful for piping):
+Use `-c -` to read from stdin:
 
 ```bash
-echo "## Overview\n\nPiped content." | entry create "My Finding" -c -
+echo "Piped content." | entry create "My Finding" -c -
 ```
 
-**This is the preferred pattern for AI agents.** It avoids the two-step create-then-edit workflow which can fail when the agent tries to Write to an existing file without reading it first.
-
 Rules:
+- **Use `--content-file` / `-f` when content has math, LaTeX, or special characters** — write a temp file with the Write tool first, then pass the path
+- Use `--content` / `-c` only for short, simple content without `$`, `()`, or backticks
 - Prefer passing a title with spaces — the tool slugifies it automatically
-- Prefer `--content` / `-c` when you have the body ready — single step, no file conflicts
 - Use `--edit` / `-e` only if the user says they want to edit it interactively
 
 ### `init`

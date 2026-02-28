@@ -49,7 +49,10 @@ def cmd_create(args):
 
 """
 
-    if args.content:
+    if args.content_file:
+        body = Path(args.content_file).read_text()
+        template = header + body + "\n"
+    elif args.content:
         if args.content == "-":
             body = sys.stdin.read()
         else:
@@ -112,6 +115,7 @@ def main():
     create_p.add_argument("filename", help="Entry filename (without .md)")
     create_p.add_argument("title", nargs="?", help="Entry title (default: auto from filename)")
     create_p.add_argument("--content", "-c", help="Entry body content (use '-' for stdin)")
+    create_p.add_argument("--content-file", "-f", help="Read entry body from a file path")
     create_p.add_argument("--edit", "-e", action="store_true", help="Open in $EDITOR after creation")
 
     # init
