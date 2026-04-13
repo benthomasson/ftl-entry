@@ -58,6 +58,8 @@ def cmd_create(args):
         else:
             body = args.content
         template = header + body + "\n"
+    elif not sys.stdin.isatty() and (body := sys.stdin.read()):
+        template = header + body + "\n"
     else:
         template = header + """## Overview
 
